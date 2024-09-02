@@ -44,7 +44,9 @@ pm.test("Valida o schema da resposta", function () {
         }
     };
     pm.response.to.have.jsonSchema(schema);
-});```
+});
+
+/javascript```
 
 ### 3.2. Validação de Status "Completed"
 
@@ -56,7 +58,8 @@ pm.test("Verificar se todos os itens têm status 'completed'", function () {
 
     pm.expect(totalPending).to.equal(0, `Nem todos os itens têm status 'completed': ${totalPending} item(s) com status diferente de 'completed'`);
     console.log(`Total de itens com status 'completed': ${totalCompleted}`);
-});```
+});
+/javascript```
 
 ### 3.3. Validação do Campo due_on
 ```javascript
@@ -70,6 +73,7 @@ pm.test("due_on is a valid date-time", function () {
         );
     });
 });
+/javascript```
 
 ## 4. DevOps, CI/CD
 
