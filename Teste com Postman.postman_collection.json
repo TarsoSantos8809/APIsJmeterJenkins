@@ -1,0 +1,120 @@
+{
+	"info": {
+		"_postman_id": "2a6c33df-fc62-4b12-b3f4-c8dd560b535d",
+		"name": "Teste com Postman",
+		"description": "# 🚀 Automação de Testes de APIs\n\nPara automatizar os testes da API REST disponibilizada em [GoRest](https://gorest.co.in/), a ferramenta escolhida é o **Postman**. O Postman é amplamente utilizado para o desenvolvimento, teste e documentação de APIs, sendo adequado por diversos motivos:\n\n- **Facilidade de Uso**: A interface intuitiva do Postman facilita a criação e execução de testes sem a necessidade de escrever código, embora também ofereça suporte a scripts em JavaScript para maior flexibilidade.\n    \n- **Suporte a Testes Automatizados**: O Postman permite criar coleções de requests que podem ser executadas sequencialmente, com a capacidade de adicionar testes em cada requisição.\n    \n- **Validação de Respostas**: A ferramenta oferece recursos para validação de schemas, verificação de status e outras validações personalizadas por meio de scripts.\n    \n- **Integração com CI/CD**: O Postman pode ser facilmente integrado com pipelines de CI/CD, através do Postman CLI (Newman), permitindo a automação dos testes em processos contínuos de desenvolvimento.\n    \n\n---\n\n**Casos de Uso de Testes**\n\nOs casos de uso para testes nesta API incluirão:\n\n1. Validação da Estrutura de Dados: Garantir que a resposta da API siga o schema esperado (campos, tipos de dados).\n    \n2. Verificação de Status: Certificar-se de que todos os itens retornados têm o status \"completed\".\n    \n3. Validação de Datas: Analisar e validar o formato e os valores das datas no campo \"due_on\".\n    \n4. Testes de Limite: Verificar o comportamento de API quando os parâmetros de busca são variados (ex.: limites de paginação).\n    \n5. Testes de Autenticação: Cerificar-se de que as respostas da API estejam adequadamente protegidas por autenticação quando necessário.\n    \n\n---\n\n### Automação de Testes com Postman\n\n**3.1. Validação de Schema**\n\nVocê pode validar o schema da resposta da API usando o seguinte script no Postman:\n\n> pm.test(\"Schema is valid\", function () {  \nvar jsonData = pm.response.json();  \nvar schema = {  \n\"type\": \"array\",  \n\"items\": {  \n\"type\": \"object\",  \n\"properties\": {  \n\"id\": {\"type\": \"integer\"},  \n\"user_id\": {\"type\": \"integer\"},  \n\"title\": {\"type\": \"string\"},  \n\"due_on\": {\"type\": \"string\", \"format\": \"date-time\"},  \n\"status\": {\"type\": \"string\"}  \n},  \n\"required\": \\[\"id\", \"user_id\", \"title\", \"due_on\", \"status\"\\]  \n}  \n};  \npm.expect(tv4.validate(jsonData, schema)).to.be.true;  \n}); \n  \n\n**Cenário para válida se todos os resultados têm status completed:**\n\n> pm.test(\"Verificar se todos os itens têm status 'completed'\", function () { let jsonData = pm.response.json();  \n// Filtra os itens com status diferente de 'completed' let nonCompletedTodos = jsonData.filter(item => item.status !== 'completed');  \n// Conta o número de itens com status diferente de 'completed' let nonCompletedCount = nonCompletedTodos.length;  \n// Asserção: todos os itens devem ter status 'completed' pm.expect(nonCompletedCount, \\`Nem todos os itens têm status 'completed': ${nonCompletedCount} item(s) com status diferente de 'completed'\\`).to.be.equal(0);  \n// Exibe o número de itens com status diferente de 'completed' no console console.log(\\`Número de itens com status diferente de 'completed': ${nonCompletedCount}\\`); // Se houver itens com status diferente de 'completed', exibe detalhes no console if (nonCompletedCount > 0) { console.log(\"Itens com status diferente de 'completed':\"); nonCompletedTodos.forEach(item => { console.log(\\`ID: ${item.id}, Status: ${item.status}, Title: ${item.title}\\`); }); }}); \n  \n\n**Cenário para Interpreta e valida o valor de \"due_on\"**\n\n> pm.test(\"due_on is a valid date-time\", function () {    // Obtém a resposta JSON    var jsonData = pm.response.json();        // Expressão regular para o formato ISO 8601 com offset de fuso horário    var iso8601WithOffsetRegex = /^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}(\\\\.\\\\d{3})?(\\[+-\\]\\\\d{2}:\\\\d{2}|Z)$/;        // Itera sobre cada item na resposta    jsonData.forEach(function(item) {        // Verifica se o campo due_on está no formato correto        pm.expect(item.due_on).to.match(iso8601WithOffsetRegex, \"due_on does not match ISO 8601 format with offset\");                // Cria um objeto Date para verificar se é uma data válida        var dueOnDate = new Date(item.due_on);                // Verifica se a data é válida        pm.expect(dueOnDate.toString()).to.not.eql(\"Invalid Date\", \"due_on is not a valid date\");    }); });",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4204126"
+	},
+	"item": [
+		{
+			"name": "Validação da Estrutura de Dados",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const schema = {",
+							"    \"type\": \"array\",",
+							"    \"items\": {",
+							"        \"type\": \"object\",",
+							"        \"properties\": {",
+							"            \"id\": { \"type\": \"integer\" },",
+							"            \"user_id\": { \"type\": \"integer\" },",
+							"            \"title\": { \"type\": \"string\" },",
+							"            \"due_on\": { \"type\": \"string\", \"format\": \"date-time\" },",
+							"            \"status\": { \"type\": \"string\" }",
+							"        },",
+							"        \"required\": [\"id\", \"user_id\", \"title\", \"due_on\", \"status\"]",
+							"    }",
+							"};",
+							"",
+							"pm.test(\"Response schema is valid\", function () {",
+							"    pm.response.to.have.jsonSchema(schema);",
+							"});",
+							"",
+							"pm.test(\"Capture unexpected HTML response\", function () {",
+							"    let responseBody = pm.response.text();  // Captura a resposta como texto",
+							"    console.log(responseBody);  // Exibe no console do Postman para análise",
+							"});",
+							"",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"packages": {},
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"protocolVersion": "auto"
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "html"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://gorest.co.in/",
+					"protocol": "https",
+					"host": [
+						"gorest",
+						"co",
+						"in"
+					],
+					"path": [
+						""
+					]
+				},
+				"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\n---\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "id",
+			"value": "1"
+		},
+		{
+			"key": "base_url",
+			"value": "https://postman-rest-api-learner.glitch.me/"
+		}
+	]
+}
